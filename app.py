@@ -21,9 +21,10 @@ recommender = get_recommender()
 sp_oauth = SpotifyOAuth(
     client_id=os.getenv("SPOTIPY_CLIENT_ID"),
     client_secret=os.getenv("SPOTIPY_CLIENT_SECRET"),
-    redirect_uri=os.getenv("SPOTIPY_REDIRECT_URI", "http://localhost:8501/"),
-    scope="playlist-read-private playlist-read-collaborative",
-    cache_handler=spotipy.MemoryCacheHandler()
+    redirect_uri=os.getenv("SPOTIPY_REDIRECT_URI", "http://127.0.0.1:8501/"),
+    scope="playlist-read-private playlist-read-collaborative user-library-read",
+    cache_handler=spotipy.MemoryCacheHandler(),
+    show_dialog=True
 )
 
 st.title("🎵 AI Playlist Song Recommender")
@@ -70,12 +71,31 @@ else:
         with st.spinner("Analyzing acoustic features..."):
             playlist_id = playlist_map[selected_playlist_name]
             
-            # Fetch tracks (up to 100)
-            items = sp.playlist_items(playlist_id, limit=100)["items"]
-            track_ids = [
-                item["track"]["id"] for item in items 
-                if item.get("track") and item["track"].get("id")
-            ]
+            # 1. Fetch playlist items
+            try:
+                playlist_response = sp.playlist_items(playlist_id, limit=100)
+                items = playlist_response.get("items", []) if playlist_response else []
+            except spotipy.exceptions.SpotifyException as e:
+                st.error(f"Spotify API Error ({e.http_status}): Unable to access tracks for this playlist.")
+                st.info("Ensure your account is added to 'User Management' in the Spotify Developer Dashboard.")
+                items = []
+
+            # 2. Extract track IDs supporting both 'item' (new) and 'track' (legacy) keys
+            track_ids = []
+            for entry in items:
+                # Support both new payload format ('item') and legacy format ('track')
+                track_obj = entry.get("item") or entry.get("track")
+                
+                if (
+                    track_obj 
+                    and isinstance(track_obj, dict)
+                    and track_obj.get("id") 
+                    and not track_obj.get("is_local", False)
+                    and track_obj.get("type") == "track"
+                ):
+                    track_ids.append(track_obj["id"])
+
+            print(f"Extracted {len(track_ids)} valid tracks.")
 
             if not track_ids:
                 st.warning("Selected playlist is empty or contains local files only.")
