@@ -17,6 +17,8 @@ The project combines the Spotify Web API with a machine-learning pipeline traine
 - 📈 Display recommendation similarity scores and genres
 - ⚡ Cache the trained recommender in Streamlit
 
+![Homepage](media/Homepage.png)
+
 ## How It Works
 
 The recommendation pipeline is:
@@ -209,7 +211,7 @@ __pycache__/
 Clone the repository:
 
 ```bash
-git clone <your-repository-url>
+git clone https://github.com/kevzjhu/Spotify-Stats.git
 cd "Spotify Stats"
 ```
 
@@ -234,8 +236,6 @@ Install dependencies:
 ```bash
 pip install -r requirements.txt
 ```
-
-If you don't have a `requirements.txt` yet, install the packages listed in the Requirements section.
 
 ## Generate the ML Artifacts
 
@@ -369,3 +369,8 @@ Potential improvements include:
 This project is intended for educational and portfolio purposes.
 
 Check the applicable terms and licenses for the Spotify Web API, Spotify data, and the underlying dataset before publicly deploying or redistributing the application.
+
+Developed by Kevin Hu  
+*Health Informatics & Data Analytics Professional*
+
+📧 [Email Me](mailto:kevzjhu@gmail.com) | 💼 [LinkedIn](https://www.linkedin.com/in/kevinhu77/)
